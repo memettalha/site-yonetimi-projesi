@@ -62,7 +62,24 @@ function App() {
   }  
   }
   
-
+//Sil fonksiyonu
+const sil = async(id:number) => {
+  if(window.confirm("Bu kaydı silmek istediğinize emin misiniz")){
+    try {
+      const response = await fetch(`http://localhost:5000/daireler/${id}`,{
+        method:'DELETE',
+      })
+      if(response.ok){
+        // Ekranı güncelle: Silinen ID hariç diğerlerini filtrele
+        setDaireler(daireler.filter(d=> d.id !==id)
+        )
+      }
+    } catch (error) {
+      console.log("Silme hatası",error)
+    }
+  }
+    
+}
 
   useEffect(() => {
     //Backend adresimize istek atıyoruz
@@ -136,7 +153,22 @@ return (
                 <td>{daire.blok}</td>
                 <td>{daire.daire_no}</td>
                 <td>{daire.sakin_adi}</td>
-                <td style={{ color: daire.borc > 0 ? 'red' : 'green' }}>{daire.borc} TL</td>                <td>{daire.telefon}</td>
+                <td style={{ color: daire.borc > 0 ? 'red' : 'green' }}>{daire.borc} TL</td>                
+                <td>{daire.telefon}</td>
+                <td style={{textAlign:'center'}}>
+                  <button
+                  onClick = {() => sil(daire.id)} 
+                  style={{ 
+                  backgroundColor: 'red', 
+                  color: 'white', 
+                  padding: '5px 10px', 
+                  cursor: 'pointer', 
+                  borderRadius: '4px', 
+                  border: '2px solid #8B0000' 
+                  }}>
+                    Sil
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

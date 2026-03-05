@@ -52,6 +52,21 @@ app.post('/daireler',async(req,res) =>{
     }
 })
 
+//Silme fonksiyonu 
+app.delete('/daireler/:id',async(req,res)=>{
+    try {
+        const {id} = req.params;
+        const result = await pool.query('DELETE FROM daireler WHERE id=$1',[id])
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Kayıt bulunamadı" });
+        }
+        res.json({ message: "Kayıt başarıyla silindi" });
+    } catch (error) {
+        console.error("Silme hatası:", error.message);
+        res.status(500).json({ error: "Silme işlemi başarısız." });
+    }
+})
+
 const PORT = 5000;
 
 
