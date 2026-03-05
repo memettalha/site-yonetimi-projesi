@@ -15,6 +15,55 @@ function App() {
   const [mesaj,setMesaj] = useState<string>("Backendden cevap bekleniyor...");
   const [yukleniyor,setYukleniyor] = useState<boolean>(true);
 
+  //Yeni kişi eklemek için
+  const[yeniKisi,  setYeniKişi] = useState<Daire>({
+    id:0,
+    daire_no:0,
+    blok:"",
+    sakin_adi:"",
+    borc:0,
+    telefon:"",
+  })
+
+  //Kaydet butonunu çalıştırma
+  const kaydet = async(e:React.BaseSyntheticEvent) => {
+    e.preventDefault();
+    console.log("TAMAMDIR: Butona basıldı ve fonksiyon çalıştı!"); // <--- Bunu ekle
+    console.log("Yeni kişi:", yeniKisi);
+    try{
+      const response = await fetch('http://localhost:5000/daireler', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body: JSON.stringify(yeniKisi)
+      })
+      console.log("Backend cevap verdi mi?:", response.ok); // Konsolda true mu yazıyor bak
+      if(response.ok){
+        const data = await response.json() 
+        console.log("Veritabanından gelen yanıt:", data);
+        alert("Kişi başarıyla kaydedildi!");
+        //Kayıt sonrası formu temizle
+        setYeniKişi({
+          id:0,
+          daire_no:0,
+          blok:"",
+          sakin_adi:"",
+          borc:0,
+          telefon:"",
+        });
+        //Daireleri güncelle
+        const updatedResponse = await fetch('http://localhost:5000/daireler');
+        const updatedDaireler = await updatedResponse.json();
+        setDaireler(updatedDaireler);             
+      }
+    }catch(error){
+    console.error("Kayıt sırasında hata",error)
+  }  
+  }
+  
+
+
   useEffect(() => {
     //Backend adresimize istek atıyoruz
     fetch('http://localhost:5000/')
@@ -48,6 +97,16 @@ return (
       marginTop: '100px' 
     }}>
       <h1>Site Yönetimi Paneli</h1>
+      <div>
+        <input type="text" placeholder="Blok adı" value={yeniKisi.blok} onChange = {(e) => setYeniKişi({...yeniKisi, blok:e.target.value})}/>
+        <input type="number" placeholder="Daire No"value={yeniKisi.daire_no} onChange = {(e) => setYeniKişi({...yeniKisi, daire_no:Number(e.target.value)})}/>
+        <input type="text" placeholder="Sakin Adı" value={yeniKisi.sakin_adi} onChange={(e) => setYeniKişi({...yeniKisi, sakin_adi:e.target.value})}/>
+        <input type="number" placeholder="Borc" value={yeniKisi.borc} onChange={(e) => setYeniKişi({...yeniKisi, borc:Number(e.target.value)})}/>
+        <input type="text" placeholder="Telefon" value={yeniKisi.telefon} onChange={(e) => setYeniKişi({...yeniKisi, telefon:e.target.value})}/>
+
+        <button onClick= {kaydet}
+         style={{backgroundColor: 'blue', color: 'white', border: 'none', padding: '10px 20px', cursor: 'pointer'}}>Kaydet</button>
+      </div>
       <div style={{ 
         padding: '20px', 
         border: '1px solid #ddd', 
