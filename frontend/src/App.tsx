@@ -9,6 +9,32 @@ interface Daire{
   telefon:string;
 }
 
+const inputStyle = {
+  padding: '10px',
+  borderRadius: '6px',
+  border: '1px solid #ddd',
+  outline: 'none'
+};
+
+const thStyle = {
+  padding: '15px',
+  textAlign: 'left' as const
+};
+
+const tdStyle = {
+  padding: '12px'
+};
+
+const silButonStyle = {
+  backgroundColor: '#c0392b',
+  color: 'white',
+  border: 'none',
+  padding: '6px 12px',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  fontSize: '12px'
+};
+
 function App() {
 
   const [daireler,setDaireler] = useState<Daire[]>([]);
@@ -106,77 +132,66 @@ const sil = async(id:number) => {
   },[])
 
 return (
-    <div style={{ 
-      fontFamily: 'Arial, sans-serif', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      marginTop: '100px' 
-    }}>
-      <h1>Site Yönetimi Paneli</h1>
-      <div>
-        <input type="text" placeholder="Blok adı" value={yeniKisi.blok} onChange = {(e) => setYeniKişi({...yeniKisi, blok:e.target.value})}/>
-        <input type="number" placeholder="Daire No"value={yeniKisi.daire_no} onChange = {(e) => setYeniKişi({...yeniKisi, daire_no:Number(e.target.value)})}/>
-        <input type="text" placeholder="Sakin Adı" value={yeniKisi.sakin_adi} onChange={(e) => setYeniKişi({...yeniKisi, sakin_adi:e.target.value})}/>
-        <input type="number" placeholder="Borc" value={yeniKisi.borc} onChange={(e) => setYeniKişi({...yeniKisi, borc:Number(e.target.value)})}/>
-        <input type="text" placeholder="Telefon" value={yeniKisi.telefon} onChange={(e) => setYeniKişi({...yeniKisi, telefon:e.target.value})}/>
+  <div style={{ 
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", 
+    backgroundColor: '#f4f7f6', 
+    minHeight: '100vh', 
+    padding: '40px' 
+  }}>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', backgroundColor: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+      
+      <h1 style={{ textAlign: 'center', color: '#2c3e50', marginBottom: '30px' }}>🏙️ Site Yönetimi Paneli</h1>
 
-        <button onClick= {kaydet}
-         style={{backgroundColor: 'blue', color: 'white', border: 'none', padding: '10px 20px', cursor: 'pointer'}}>Kaydet</button>
+      {/* Giriş Formu Alanı */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '30px', padding: '20px', border: '1px solid #eee', borderRadius: '8px' }}>
+        <input type="text" placeholder="Blok" value={yeniKisi.blok} onChange={(e) => setYeniKişi({...yeniKisi, blok:e.target.value})} style={inputStyle}/>
+        <input type="number" placeholder="Daire No" value={yeniKisi.daire_no} onChange={(e) => setYeniKişi({...yeniKisi, daire_no:Number(e.target.value)})} style={inputStyle}/>
+        <input type="text" placeholder="Sakin Adı" value={yeniKisi.sakin_adi} onChange={(e) => setYeniKişi({...yeniKisi, sakin_adi:e.target.value})} style={inputStyle}/>
+        <input type="number" placeholder="Borç" value={yeniKisi.borc} onChange={(e) => setYeniKişi({...yeniKisi, borc:Number(e.target.value)})} style={inputStyle}/>
+        <input type="text" placeholder="Telefon" value={yeniKisi.telefon} onChange={(e) => setYeniKişi({...yeniKisi, telefon:e.target.value})} style={inputStyle}/>
+        
+        <button onClick={kaydet} style={{ 
+          gridColumn: 'span 1', backgroundColor: '#27ae60', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', transition: '0.3s' 
+        }}>Kaydet</button>
       </div>
-      <div style={{ 
-        padding: '20px', 
-        border: '1px solid #ddd', 
-        borderRadius: '8px',
-        backgroundColor: '#f9f9f9' 
-      }}>
-        {yukleniyor ? (
-          <p>Yükleniyor...</p>
-        ) : (
-          <p>Durum: <strong>{mesaj}</strong></p>
-        )}
+
+      {/* Durum Mesajı */}
+      <div style={{ textAlign: 'center', marginBottom: '20px', fontSize: '14px', color: '#7f8c8d' }}>
+        {yukleniyor ? "Yükleniyor..." : `Sistem Durumu: ${mesaj}`}
       </div>
+
+      {/* Tablo Alanı */}
       {!yukleniyor && daireler.length > 0 && (
-        <table border={1} style={{ width: '80%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
           <thead>
-            <tr style= {{backgroundColor :'#eee'}}>
-              <th>Blok</th>
-              <th>Daire No</th>
-              <th>Sakin Adı</th>
-              <th>Borc</th>
-              <th>Telefon</th>
+            <tr style={{ backgroundColor: '#34495e', color: 'white' }}>
+              <th style={thStyle}>Blok</th>
+              <th style={thStyle}>Daire</th>
+              <th style={thStyle}>Sakin</th>
+              <th style={thStyle}>Borç</th>
+              <th style={thStyle}>Telefon</th>
+              <th style={thStyle}>İşlem</th>
             </tr>
           </thead>
           <tbody>
             {daireler.map((daire) => (
-              <tr key={daire.id}>
-                <td>{daire.blok}</td>
-                <td>{daire.daire_no}</td>
-                <td>{daire.sakin_adi}</td>
-                <td style={{ color: daire.borc > 0 ? 'red' : 'green' }}>{daire.borc} TL</td>                
-                <td>{daire.telefon}</td>
-                <td style={{textAlign:'center'}}>
-                  <button
-                  onClick = {() => sil(daire.id)} 
-                  style={{ 
-                  backgroundColor: 'red', 
-                  color: 'white', 
-                  padding: '5px 10px', 
-                  cursor: 'pointer', 
-                  borderRadius: '4px', 
-                  border: '2px solid #8B0000' 
-                  }}>
-                    Sil
-                  </button>
+              <tr key={daire.id} style={{ borderBottom: '1px solid #eee' }}>
+                <td style={tdStyle}>{daire.blok}</td>
+                <td style={tdStyle}>{daire.daire_no}</td>
+                <td style={tdStyle}>{daire.sakin_adi}</td>
+                <td style={{ ...tdStyle, color: daire.borc > 0 ? '#e74c3c' : '#27ae60', fontWeight: 'bold' }}>{daire.borc} TL</td>
+                <td style={tdStyle}>{daire.telefon}</td>
+                <td style={tdStyle}>
+                  <button onClick={() => sil(daire.id)} style={silButonStyle}>Sil</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
-      
     </div>
-  );
+  </div>
+);
 }
 
 export default App;
