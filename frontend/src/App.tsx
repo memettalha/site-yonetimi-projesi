@@ -42,6 +42,7 @@ function App() {
   const [mesaj,setMesaj] = useState<string>("Backendden cevap bekleniyor...");
   const [yukleniyor,setYukleniyor] = useState<boolean>(true);
   const [duzenleId,setDuzenleId] = useState<number | null>(null)
+  const [aramaMetni,setAramaMetni] = useState("")
 
   //Yeni kişi eklemek için
   const[yeniKisi,  setYeniKişi] = useState<Daire>({
@@ -127,6 +128,7 @@ const sil = async(id:number) => {
     
 }
 
+//Vazgeç fonksiyonu
 const vazgec = () =>{
   setDuzenleId(null);
   setYeniKişi({
@@ -138,6 +140,14 @@ const vazgec = () =>{
     telefon:"",
   })
 }
+
+//Filtreleme ile arama
+  const suzulmusDairler = daireler.filter(daire => {
+    const isim = daire.sakin_adi ? daire.sakin_adi.toLowerCase():"";
+    const blok = daire.blok ? daire.blok.toLowerCase():"";
+    const arama = aramaMetni.toLowerCase();
+    return isim.includes(arama) || blok.includes(arama)
+  })
 
   useEffect(() => {
     //Backend adresimize istek atıyoruz
@@ -192,6 +202,18 @@ return (
       <div style={{ textAlign: 'center', marginBottom: '20px', fontSize: '14px', color: '#7f8c8d' }}>
         {yukleniyor ? "Yükleniyor..." : `Sistem Durumu: ${mesaj}`}
       </div>
+      
+      {/* Arama Kutusu */}
+      <div style={{marginBottom:"20px"}}>
+        <p style={{fontWeight:"bold",marginBottom:"5px"}}>Kişi veya blok ara</p>
+        <input
+        type = "text"
+        placeholder = "İsim veya blok arat"
+        value = {aramaMetni}
+        onChange = {(e) => setAramaMetni(e.target.value)}
+        style={{ ...inputStyle, width: '100%', boxSizing: 'border-box' }}>
+        </input>
+      </div>
 
       {/* Tablo Alanı */}
       {!yukleniyor && daireler.length > 0 && (
@@ -207,7 +229,7 @@ return (
             </tr>
           </thead>
           <tbody>
-            {daireler.map((daire) => (
+            {suzulmusDairler.map((daire) => (
               <tr key={daire.id} style={{ borderBottom: '1px solid #eee' }}>
                 <td style={tdStyle}>{daire.blok}</td>
                 <td style={tdStyle}>{daire.daire_no}</td>
