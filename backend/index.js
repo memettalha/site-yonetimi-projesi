@@ -39,6 +39,8 @@ app.post('/daireler',async(req,res) =>{
         const yeniDaire = await pool.query(
             'INSERT INTO daireler (daire_no,blok,sakin_adi,borc,telefon) VALUES ($1,$2,$3,$4,$5) RETURNING *',
             [daire_no,blok,sakin_adi,borc,telefon ]
+
+        
         )
 
         //Başarılı mesajını burada gönderiyoruz!
@@ -49,6 +51,27 @@ app.post('/daireler',async(req,res) =>{
         console.error("Veritabanına eklerken bir hata oldu")
         res.status(500).send("Sunucu hatası");
         
+    }
+})
+
+//GüNcelleme fonksiyonu
+app.put('/daireler/:id',async(req,res) => {
+    try {
+        const {id} = req.params;
+        const{daire_no,blok,sakin_adi,borc,telefon} = req.body
+
+        const guncelle = await pool.query(
+            'UPDATE daireler SET daire_no=$1, blok=$2, sakin_adi=$3, borc=$4, telefon=$5 WHERE id = $6 RETURNING *',
+            [daire_no,blok,sakin_adi,borc,telefon,id]
+        )
+        if(guncelle.rows.length ===0){
+            return res.status(404).json({error:'Güncellenecek kayıt bulunamadı'})
+        }
+        console.log('Kayıt güncellendi',guncelle.rows[0])
+        res.json(guncelle.rows[0])
+    } catch (error) {
+        console.log("Hata:",error)
+        res.status(500).send("Sunucu hatası")
     }
 })
 

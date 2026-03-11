@@ -40,3 +40,23 @@
 .read-the-docs {
   color: #888;
 }
+
+.vazgec-btn {
+  background-color: #6c757d; /* Modern bir gri tonu */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.vazgec-btn:hover {
+  background-color: #5a6268; /* Üzerine gelince biraz koyulaşsın */
+}
+
+.vazgec-btn:active {
+  transform: scale(0.98); /* Basınca hafifçe çöksün */
+}

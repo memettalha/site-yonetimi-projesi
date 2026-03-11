@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import './App.css'
 
 interface Daire{
   id:number;
@@ -40,6 +41,7 @@ function App() {
   const [daireler,setDaireler] = useState<Daire[]>([]);
   const [mesaj,setMesaj] = useState<string>("Backendden cevap bekleniyor...");
   const [yukleniyor,setYukleniyor] = useState<boolean>(true);
+  const [duzenleId,setDuzenleId] = useState<number | null>(null)
 
   //Yeni kişi eklemek için
   const[yeniKisi,  setYeniKişi] = useState<Daire>({
@@ -56,9 +58,13 @@ function App() {
     e.preventDefault();
     console.log("TAMAMDIR: Butona basıldı ve fonksiyon çalıştı!"); // <--- Bunu ekle
     console.log("Yeni kişi:", yeniKisi);
-    try{
-      const response = await fetch('http://localhost:5000/daireler', {
-        method:'POST',
+   
+     try{
+      // Karar veriyoruz
+      const url = duzenleId ? `http://localhost:5000/daireler/${duzenleId}` : 'http://localhost:5000/daireler';
+      const method = duzenleId ? 'PUT' : 'POST';
+      const response = await fetch(url, {
+        method:method,
         headers:{
           'Content-Type':'application/json'
         },
@@ -68,8 +74,8 @@ function App() {
       if(response.ok){
         const data = await response.json() 
         console.log("Veritabanından gelen yanıt:", data);
-        alert("Kişi başarıyla kaydedildi!");
-        //Kayıt sonrası formu temizle
+        alert(duzenleId ? "Başarıyla Güncellendi!" : "Başarıyla Kaydedildi!");        //Kayıt sonrası formu temizle
+        setDuzenleId(null); // Modu sıfırla
         setYeniKişi({
           id:0,
           daire_no:0,
@@ -78,6 +84,9 @@ function App() {
           borc:0,
           telefon:"",
         });
+        // Listeyi yenilemek için senin fetch kodun...
+        const res = await fetch('http://localhost:5000/daireler');
+        setDaireler(await res.json());
         //Daireleri güncelle
         const updatedResponse = await fetch('http://localhost:5000/daireler');
         const updatedDaireler = await updatedResponse.json();
@@ -87,7 +96,18 @@ function App() {
     console.error("Kayıt sırasında hata",error)
   }  
   }
-  
+  //Düzenle butonu 
+  const duzenleModunaGec = async(daire:Daire) =>{
+    setDuzenleId(daire.id);
+    setYeniKişi({
+      id:daire.id,
+      daire_no:daire.daire_no,
+      blok:daire.blok,
+      sakin_adi:daire.sakin_adi,
+      borc: daire.borc,
+      telefon: daire.telefon
+    })   
+  }
 //Sil fonksiyonu
 const sil = async(id:number) => {
   if(window.confirm("Bu kaydı silmek istediğinize emin misiniz")){
@@ -105,6 +125,18 @@ const sil = async(id:number) => {
     }
   }
     
+}
+
+const vazgec = () =>{
+  setDuzenleId(null);
+  setYeniKişi({
+    id:0,
+    daire_no:0,
+    blok:"",
+    sakin_adi:"",
+    borc:0,
+    telefon:"",
+  })
 }
 
   useEffect(() => {
@@ -150,6 +182,7 @@ return (
         <input type="number" placeholder="Borç" value={yeniKisi.borc} onChange={(e) => setYeniKişi({...yeniKisi, borc:Number(e.target.value)})} style={inputStyle}/>
         <input type="text" placeholder="Telefon" value={yeniKisi.telefon} onChange={(e) => setYeniKişi({...yeniKisi, telefon:e.target.value})} style={inputStyle}/>
         
+        <button type="button" className="vazgec-btn" onClick={vazgec}>Vazgeç</button>
         <button onClick={kaydet} style={{ 
           gridColumn: 'span 1', backgroundColor: '#27ae60', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', transition: '0.3s' 
         }}>Kaydet</button>
@@ -182,7 +215,15 @@ return (
                 <td style={{ ...tdStyle, color: daire.borc > 0 ? '#e74c3c' : '#27ae60', fontWeight: 'bold' }}>{daire.borc} TL</td>
                 <td style={tdStyle}>{daire.telefon}</td>
                 <td style={tdStyle}>
-                  <button onClick={() => sil(daire.id)} style={silButonStyle}>Sil</button>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => sil(daire.id)} style={silButonStyle}>Sil</button>
+                    <button onClick={() =>duzenleModunaGec(daire)}
+                    style={{backgroundColor: '#2980b9',color: 'white',
+                      border: 'none',padding: '5px 10px',borderRadius: '4px',cursor: 'pointer'
+                    }}
+                    >Düzenle</button>
+                  </div>
+                
                 </td>
               </tr>
             ))}
